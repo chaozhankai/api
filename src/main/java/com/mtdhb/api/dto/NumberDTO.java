@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class NumberDTO {
 
-    private long available;
-    private long total;
+    private Long available;
+    private Long total;
 
 }

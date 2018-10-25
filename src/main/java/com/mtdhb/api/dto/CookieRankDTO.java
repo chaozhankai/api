@@ -9,8 +9,8 @@ import lombok.Data;
 @Data
 public class CookieRankDTO {
 
-    private long ranking;
-    private long userId;
-    private long count;
+    private Long ranking;
+    private Long userId;
+    private Long count;
 
 }

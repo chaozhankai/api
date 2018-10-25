@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -97,7 +96,7 @@ public class CookieServiceImpl implements CookieService {
     public List<CookieRankDTO> listCookieRank(ThirdPartyApplication application) {
         Page<CookieRankView> page = cookieRepository.findCookieRankViewByApplication(application,
                 PageRequest.of(0, 100));
-        final AtomicInteger ranking = new AtomicInteger();
+        final AtomicLong ranking = new AtomicLong();
         List<CookieRankDTO> cookieRankDTOs = page.map(cookieRankView -> {
             CookieRankDTO cookieRankDTO = new CookieRankDTO();
             BeanUtils.copyProperties(cookieRankView, cookieRankDTO);

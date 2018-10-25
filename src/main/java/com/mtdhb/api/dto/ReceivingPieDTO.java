@@ -12,6 +12,6 @@ import lombok.Data;
 public class ReceivingPieDTO {
 
     private BigDecimal price;
-    private long proportion;
+    private Long proportion;
 
 }

@@ -13,6 +13,6 @@ public class ReceivingTrendDTO {
 
     private String date;
     private BigDecimal totalPrice;
-    private long count;
+    private Long count;
 
 }
