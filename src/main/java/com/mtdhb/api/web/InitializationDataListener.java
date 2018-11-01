@@ -14,7 +14,7 @@ import com.mtdhb.api.dao.ReceivingRepository;
 import com.mtdhb.api.entity.Receiving;
 import com.mtdhb.api.service.AsyncService;
 import com.mtdhb.api.service.CookieService;
-import com.mtdhb.api.service.UserService;
+import com.mtdhb.api.service.TimesService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +31,7 @@ public class InitializationDataListener implements ApplicationListener<ContextRe
     @Autowired
     private CookieService cookieService;
     @Autowired
-    private UserService userService;
+    private TimesService timesService;
     @Autowired
     private ReceivingRepository receivingRepository;
 
@@ -45,7 +45,7 @@ public class InitializationDataListener implements ApplicationListener<ContextRe
             List<Receiving> receivings = receivingRepository.findByStatus(ReceivingStatus.ING);
             log.info("receivings#size={}", receivings.size());
             receivings.stream().forEach(receiving -> {
-                long available = userService.getAvailable(receiving.getApplication(), receiving.getUserId());
+                long available = timesService.getAvailable(receiving.getApplication(), receiving.getUserId());
                 asyncService.dispatch(receiving, available);
             });
         }

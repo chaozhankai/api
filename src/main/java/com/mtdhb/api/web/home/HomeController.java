@@ -3,6 +3,7 @@ package com.mtdhb.api.web.home;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mtdhb.api.constant.e.ThirdPartyApplication;
 import com.mtdhb.api.dto.Result;
 import com.mtdhb.api.dto.UserDTO;
+import com.mtdhb.api.service.CookieRankDailyService;
 import com.mtdhb.api.service.CookieService;
 import com.mtdhb.api.service.ReceivingService;
 import com.mtdhb.api.util.Results;
@@ -28,6 +30,8 @@ public class HomeController {
 
     @Autowired
     private CookieService cookieService;
+    @Autowired
+    private CookieRankDailyService cookieRankDailyService;
     @Autowired
     private ReceivingService receivingService;
 
@@ -48,9 +52,14 @@ public class HomeController {
 
     @RequestMapping("/rank")
     public Result rank() {
-        return Results.success(Stream.of(ThirdPartyApplication.values())
+        // TODO 配置
+        int size = 100;
+        Map<String, Object> data = Stream.of(ThirdPartyApplication.values())
                 .collect(Collectors.toMap(application -> application.name().toLowerCase(),
-                        application -> cookieService.listCookieRank(application))));
+                        application -> cookieService.listCookieRank(application, size)));
+        data.put("eleYesterday", cookieRankDailyService.list(ThirdPartyApplication.ELE,
+                Timestamp.valueOf(LocalDate.now().atStartOfDay()), size));
+        return Results.success(data);
     }
 
     @RequestMapping("/trend")

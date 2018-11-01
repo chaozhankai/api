@@ -30,6 +30,8 @@ public class CachingAutoConfiguration {
                 .serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
         cacheConfigurations.put(CacheNames.USER, defaultCacheConfiguration.entryTtl(Duration.ofMinutes(30L)));
         cacheConfigurations.put(CacheNames.COOKIE_RANK, defaultCacheConfiguration.entryTtl(Duration.ofMinutes(30L)));
+        cacheConfigurations.put(CacheNames.COOKIE_RANK_DAILY,
+                defaultCacheConfiguration.entryTtl(Duration.ofMinutes(30L)));
         cacheConfigurations.put(CacheNames.RECEIVING_CAROUSEL,
                 defaultCacheConfiguration.entryTtl(Duration.ofSeconds(60L)));
         cacheConfigurations.put(CacheNames.RECEIVING_TREND,

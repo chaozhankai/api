@@ -3,9 +3,7 @@
  */
 package com.mtdhb.api.service;
 
-import com.mtdhb.api.constant.e.ThirdPartyApplication;
 import com.mtdhb.api.dto.AccountDTO;
-import com.mtdhb.api.dto.NumberDTO;
 import com.mtdhb.api.dto.UserDTO;
 
 /**
@@ -35,9 +33,5 @@ public interface UserService {
     void sendResetPasswordMail(String mail);
 
     UserDTO getByToken(String token);
-
-    long getAvailable(ThirdPartyApplication application, long userId);
-
-    NumberDTO getNumber(ThirdPartyApplication application, long userId);
 
 }

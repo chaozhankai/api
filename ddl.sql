@@ -99,3 +99,31 @@ CREATE TABLE `verification` (
   UNIQUE KEY `uk_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `times`;
+
+CREATE TABLE `times` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `number` bigint(20) NOT NULL,
+  `application` tinyint(1) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `gmt_create` datetime NOT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `cookie_rank_daily`;
+
+CREATE TABLE `cookie_rank_daily` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `ranking` int(11) NOT NULL,
+  `count` bigint(20) NOT NULL,
+  `application` tinyint(1) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `times_id` bigint(20) NOT NULL,
+  `gmt_create` datetime NOT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_times_id` (`times_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

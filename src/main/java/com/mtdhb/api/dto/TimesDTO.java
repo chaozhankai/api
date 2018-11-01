@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2018/06/26
  */
 @Data
-public class NumberDTO {
+public class TimesDTO {
 
     private Long available;
     private Long total;

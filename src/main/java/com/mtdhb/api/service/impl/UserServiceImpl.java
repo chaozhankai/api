@@ -3,7 +3,6 @@ package com.mtdhb.api.service.impl;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
@@ -13,19 +12,13 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.mtdhb.api.autoconfigure.MailProperties;
-import com.mtdhb.api.autoconfigure.ThirdPartyApplicationProperties;
 import com.mtdhb.api.constant.CacheNames;
-import com.mtdhb.api.constant.e.CookieUseStatus;
 import com.mtdhb.api.constant.e.ErrorCode;
 import com.mtdhb.api.constant.e.Purpose;
-import com.mtdhb.api.constant.e.ThirdPartyApplication;
 import com.mtdhb.api.constant.e.VerificationType;
-import com.mtdhb.api.dao.CookieRepository;
-import com.mtdhb.api.dao.CookieUseCountRepository;
 import com.mtdhb.api.dao.UserRepository;
 import com.mtdhb.api.dao.VerificationRepository;
 import com.mtdhb.api.dto.AccountDTO;
-import com.mtdhb.api.dto.NumberDTO;
 import com.mtdhb.api.dto.UserDTO;
 import com.mtdhb.api.entity.User;
 import com.mtdhb.api.entity.Verification;
@@ -47,17 +40,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AsyncService asyncService;
     @Autowired
-    private CookieRepository cookieRepository;
-    @Autowired
-    private CookieUseCountRepository cookieUseCountRepository;
-    @Autowired
     private UserRepository userRepository;
     @Autowired
     private VerificationRepository verificationRepository;
     @Autowired
     private MailProperties mailProperties;
-    @Autowired
-    private ThirdPartyApplicationProperties thirdPartyApplicationProperties;
 
     @Override
     public UserDTO loginByMail(String mail, String password) {
@@ -158,24 +145,6 @@ public class UserServiceImpl implements UserService {
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         return userDTO;
-    }
-
-    @Override
-    public long getAvailable(ThirdPartyApplication application, long userId) {
-        return getNumber(application, userId).getAvailable();
-    }
-
-    @Override
-    public NumberDTO getNumber(ThirdPartyApplication application, long userId) {
-        long total = cookieRepository.countByApplicationAndValidAndUserId(application, true, userId)
-                * thirdPartyApplicationProperties.getDailies()[application.ordinal()];
-        long used = cookieUseCountRepository.countByStatusAndApplicationAndReceivingUserIdAndGmtCreateGreaterThan(
-                CookieUseStatus.SUCCESS, application, userId, Timestamp.valueOf(LocalDate.now().atStartOfDay()));
-        NumberDTO numberDTO = new NumberDTO();
-        // TODO 还要减去检测到私用的次数
-        numberDTO.setAvailable(total - used);
-        numberDTO.setTotal(total);
-        return numberDTO;
     }
 
     private Verification verify(String code, VerificationType type, Purpose purpose, Timestamp effectiveTime,

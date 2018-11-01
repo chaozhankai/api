@@ -15,14 +15,14 @@ public interface CookieService {
 
     List<CookieDTO> list(long userId);
 
-    List<CookieRankDTO> listCookieRank(ThirdPartyApplication applicaton);
+    List<CookieRankDTO> listCookieRank(ThirdPartyApplication applicaton, int size);
 
     void load(ThirdPartyApplication application);
 
     CookieDTO save(String value, ThirdPartyApplication application, long userId) throws IOException;
 
     void delete(long cookieId, long userId);
-    
+
     void delete(ThirdPartyApplication application, boolean valid, long userId);
 
 }

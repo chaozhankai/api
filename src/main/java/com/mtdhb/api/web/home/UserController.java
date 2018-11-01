@@ -33,6 +33,7 @@ import com.mtdhb.api.dto.UserDTO;
 import com.mtdhb.api.exception.BusinessException;
 import com.mtdhb.api.service.CookieService;
 import com.mtdhb.api.service.ReceivingService;
+import com.mtdhb.api.service.TimesService;
 import com.mtdhb.api.service.UserService;
 import com.mtdhb.api.util.Captcha;
 import com.mtdhb.api.util.Connections;
@@ -55,11 +56,13 @@ public class UserController {
     private static final Pattern PHONE_PATTERN = Pattern.compile("^1\\d{10}$");
 
     @Autowired
-    private UserService userService;
-    @Autowired
     private CookieService cookieService;
     @Autowired
     private ReceivingService receivingService;
+    @Autowired
+    private TimesService timesService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private ThirdPartyApplicationProperties thirdPartyApplicationProperties;
 
@@ -229,7 +232,7 @@ public class UserController {
         UserDTO userDTO = RequestContextHolder.get();
         return Results.success(Stream.of(ThirdPartyApplication.values())
                 .collect(Collectors.toMap(application -> application.name().toLowerCase(),
-                        application -> userService.getNumber(application, userDTO.getId()))));
+                        application -> timesService.getTimes(application, userDTO.getId()))));
     }
 
     private void checkCaptcha(String captcha, String sessionKey, HttpSession session) {

@@ -16,4 +16,6 @@ public class CacheNames {
 
     public static final String RECEIVING_PIE = "RECEIVING_PIE";
 
+    public static final String COOKIE_RANK_DAILY = "COOKIE_RANK_DAILY";
+
 }

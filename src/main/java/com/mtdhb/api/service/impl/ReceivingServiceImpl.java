@@ -52,7 +52,7 @@ import com.mtdhb.api.service.AsyncService;
 import com.mtdhb.api.service.CookieService;
 import com.mtdhb.api.service.NodejsService;
 import com.mtdhb.api.service.ReceivingService;
-import com.mtdhb.api.service.UserService;
+import com.mtdhb.api.service.TimesService;
 import com.mtdhb.api.util.Entities;
 
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +72,7 @@ public class ReceivingServiceImpl implements ReceivingService {
     @Autowired
     private NodejsService nodejsService;
     @Autowired
-    private UserService userService;
+    private TimesService timesService;
     @Autowired
     private CookieRepository cookieRepository;
     @Autowired
@@ -223,7 +223,7 @@ public class ReceivingServiceImpl implements ReceivingService {
                     "application={}, status={}, userId={}, receiving={}", application, ReceivingStatus.ING, userId,
                     receiving);
         }
-        long available = userService.getAvailable(application, userId);
+        long available = timesService.getAvailable(application, userId);
         if (available < 2L) {
             throw new BusinessException(ErrorCode.AVAILABLE_INSUFFICIENT, "application={}, userId={}, available={}",
                     application, userId, available);

@@ -17,6 +17,7 @@ import com.mtdhb.api.constant.e.ThirdPartyApplication;
 import com.mtdhb.api.entity.Cookie;
 import com.mtdhb.api.service.CookieService;
 import com.mtdhb.api.service.CookieUseCountService;
+import com.mtdhb.api.service.TimesService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,8 @@ public class ScheduleTask {
     private CookieService cookieService;
     @Autowired
     private CookieUseCountService cookieUseCountService;
+    @Autowired
+    private TimesService timesService;
     @Resource(name = "usage")
     private Map<Long, Long> usage;
     @Resource(name = "queues")
@@ -54,6 +57,12 @@ public class ScheduleTask {
     public void clear() {
         log.info("Clear starting...");
         cookieUseCountService.deleteByStatus(CookieUseStatus.SUCCESS);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void gift() {
+        log.info("Gift starting...");
+        timesService.gift();
     }
 
 }

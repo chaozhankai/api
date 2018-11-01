@@ -30,7 +30,7 @@ public interface CookieRepository extends CrudRepository<Cookie, Long> {
     Cookie findByIdAndUserId(long id, long userId);
 
     @Query("select c.userId as userId, count(*) as count from Cookie c where c.valid=true and c.application=?1 group by c.userId order by count(*) desc, max(c.gmtCreate)")
-    Page<CookieRankView> findCookieRankViewByApplication(ThirdPartyApplication application, Pageable pageable);
+    Page<CookieRankView> findCookieRankView(ThirdPartyApplication application, Pageable pageable);
     
     @Transactional
     void deleteByApplicationAndValidAndUserId(ThirdPartyApplication application, boolean valid, long userId);

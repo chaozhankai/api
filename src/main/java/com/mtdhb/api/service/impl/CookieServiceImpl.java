@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -39,7 +40,7 @@ import com.mtdhb.api.entity.view.CookieUseCountView;
 import com.mtdhb.api.exception.BusinessException;
 import com.mtdhb.api.service.CookieService;
 import com.mtdhb.api.service.NodejsService;
-import com.mtdhb.api.service.UserService;
+import com.mtdhb.api.service.TimesService;
 import com.mtdhb.api.util.Entities;
 import com.mtdhb.api.util.Synchronizes;
 
@@ -58,7 +59,7 @@ public class CookieServiceImpl implements CookieService {
     @Autowired
     private NodejsService nodejsService;
     @Autowired
-    private UserService userService;
+    private TimesService timesService;
     @Autowired
     private CookieRepository cookieRepository;
     @Autowired
@@ -93,10 +94,10 @@ public class CookieServiceImpl implements CookieService {
 
     @Cacheable(cacheNames = CacheNames.COOKIE_RANK)
     @Override
-    public List<CookieRankDTO> listCookieRank(ThirdPartyApplication application) {
-        Page<CookieRankView> page = cookieRepository.findCookieRankViewByApplication(application,
-                PageRequest.of(0, 100));
-        final AtomicLong ranking = new AtomicLong();
+    public List<CookieRankDTO> listCookieRank(ThirdPartyApplication application, int size) {
+        Page<CookieRankView> page = cookieRepository.findCookieRankView(application,
+                PageRequest.of(0, size));
+        final AtomicInteger ranking = new AtomicInteger();
         List<CookieRankDTO> cookieRankDTOs = page.map(cookieRankView -> {
             CookieRankDTO cookieRankDTO = new CookieRankDTO();
             BeanUtils.copyProperties(cookieRankView, cookieRankDTO);
@@ -197,7 +198,7 @@ public class CookieServiceImpl implements CookieService {
                         "cookieId={}, status={},userId={}, receiving={}", cookieId, ReceivingStatus.ING, userId,
                         receiving);
             }
-            long available = userService.getAvailable(application, userId);
+            long available = timesService.getAvailable(application, userId);
             if (available < thirdPartyApplicationProperties.getDailies()[application.ordinal()]) {
                 throw new BusinessException(ErrorCode.COOKIE_DELETE_EXCEPTION,
                         "cookieId={}, application={}, userId={}, available={}", cookieId, application, userId,
