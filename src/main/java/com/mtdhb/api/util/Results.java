@@ -10,6 +10,7 @@ public class Results {
 
     public static Result success(Object data) {
         Result result = new Result();
+        result.setCode(0);
         result.setData(data);
         return result;
     }
