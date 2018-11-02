@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.stereotype.Service;
 
 import com.mtdhb.api.autoconfigure.ThirdPartyApplicationProperties;
+import com.mtdhb.api.constant.CacheNames;
 import com.mtdhb.api.constant.e.CookieUseStatus;
 import com.mtdhb.api.constant.e.ThirdPartyApplication;
 import com.mtdhb.api.dao.CookieRankDailyRepository;
@@ -30,6 +33,8 @@ import com.mtdhb.api.service.TimesService;
 @Service
 public class TimesServiceImpl implements TimesService {
 
+    @Autowired
+    private CacheManager cacheManager;
     @Autowired
     private CookieService cookieService;
     @Autowired
@@ -68,11 +73,12 @@ public class TimesServiceImpl implements TimesService {
 
     @Override
     public void gift() {
+        int size = 100;
         // TODO 配置
         long[] numbers = new long[] { 100, 80, 60, 40, 40, 40, 40, 40, 40, 40, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20 };
         Timestamp timestamp = Timestamp.from(Instant.now());
         // TODO 配置
-        List<CookieRankDTO> list = cookieService.listCookieRank(ThirdPartyApplication.ELE, 100);
+        List<CookieRankDTO> list = cookieService.listCookieRank(ThirdPartyApplication.ELE, size);
         List<CookieRankDaily> cookieRankDailys = list.stream().map(cookieRankDTO -> {
             long userId = cookieRankDTO.getUserId();
             Times times = new Times();
@@ -96,6 +102,8 @@ public class TimesServiceImpl implements TimesService {
             return cookieRankDaily;
         }).collect(Collectors.toList());
         cookieRankDailyRepository.saveAll(cookieRankDailys);
+        cacheManager.getCache(CacheNames.COOKIE_RANK_DAILY).evict(SimpleKeyGenerator
+                .generateKey(ThirdPartyApplication.ELE, Timestamp.valueOf(LocalDate.now().atStartOfDay()), size));
     }
 
 }

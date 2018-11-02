@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.stereotype.Service;
 
 import com.mtdhb.api.autoconfigure.MailProperties;
@@ -119,7 +120,7 @@ public class UserServiceImpl implements UserService {
         user.setGmtModified(timestamp);
         userRepository.save(user);
         // 使该用户旧 token 失效
-        cacheManager.getCache(CacheNames.USER).evict(token);
+        cacheManager.getCache(CacheNames.USER).evict(SimpleKeyGenerator.generateKey(token));
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         return userDTO;
