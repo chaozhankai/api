@@ -69,7 +69,7 @@ public class TimesServiceImpl implements TimesService {
     @Override
     public void gift() {
         // TODO 配置
-        long[] numbers = new long[] { 100, 70, 50, 30, 30, 30, 30, 30, 30, 30, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
+        long[] numbers = new long[] { 100, 80, 60, 40, 40, 40, 40, 40, 40, 40, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20 };
         Timestamp timestamp = Timestamp.from(Instant.now());
         ThirdPartyApplication application = ThirdPartyApplication.ELE;
         // TODO 配置
