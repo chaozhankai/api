@@ -42,7 +42,7 @@ public class ScheduleTask {
     @Resource(name = "endpoints")
     private AtomicLong[] endpoints;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "1 0 0 * * ?")
     public void reload() {
         log.info("Reload starting...");
         usage.clear();
@@ -53,13 +53,13 @@ public class ScheduleTask {
         });
     }
 
-    @Scheduled(cron = "0 55 23 * * ?")
+    @Scheduled(cron = "1 0 0 * * ?")
     public void clear() {
         log.info("Clear starting...");
         cookieUseCountService.deleteByStatus(CookieUseStatus.SUCCESS);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "1 0 0 * * ?")
     public void gift() {
         log.info("Gift starting...");
         timesService.gift();

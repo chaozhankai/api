@@ -71,9 +71,8 @@ public class TimesServiceImpl implements TimesService {
         // TODO 配置
         long[] numbers = new long[] { 100, 80, 60, 40, 40, 40, 40, 40, 40, 40, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20 };
         Timestamp timestamp = Timestamp.from(Instant.now());
-        ThirdPartyApplication application = ThirdPartyApplication.ELE;
         // TODO 配置
-        List<CookieRankDTO> list = cookieService.listCookieRank(application, 100);
+        List<CookieRankDTO> list = cookieService.listCookieRank(ThirdPartyApplication.ELE, 100);
         List<CookieRankDaily> cookieRankDailys = list.stream().map(cookieRankDTO -> {
             long userId = cookieRankDTO.getUserId();
             Times times = new Times();
@@ -83,14 +82,14 @@ public class TimesServiceImpl implements TimesService {
             } else {
                 times.setNumber(0L);
             }
-            times.setApplication(application);
+            times.setApplication(ThirdPartyApplication.MEITUAN);
             times.setUserId(userId);
             times.setGmtCreate(timestamp);
             timesRepository.save(times);
             CookieRankDaily cookieRankDaily = new CookieRankDaily();
             cookieRankDaily.setRanking(cookieRankDTO.getRanking());
             cookieRankDaily.setCount(cookieRankDTO.getCount());
-            cookieRankDaily.setApplication(application);
+            cookieRankDaily.setApplication(ThirdPartyApplication.ELE);
             cookieRankDaily.setUserId(userId);
             cookieRankDaily.setTimesId(times.getId());
             cookieRankDaily.setGmtCreate(timestamp);
