@@ -15,7 +15,11 @@ public enum ThirdPartyApplication {
     /**
      * 饿了么
      */
-    ELE;
+    ELE,
+    /**
+     * 饿了么星选
+     */
+    STAR;
 
     @JsonValue
     public int getJsonValue() {

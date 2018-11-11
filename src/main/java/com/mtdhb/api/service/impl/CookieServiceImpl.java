@@ -146,7 +146,7 @@ public class CookieServiceImpl implements CookieService {
                     cookieCheckDTO);
         }
         String phone = cookieCheckDTO.getPhone();
-        if (application.equals(ThirdPartyApplication.ELE)) {
+        if (application.equals(ThirdPartyApplication.ELE) || application.equals(ThirdPartyApplication.STAR)) {
             cookie = cookieRepository.findByPhone(phone);
             if (cookie != null) {
                 cookie.setPhone(null);
