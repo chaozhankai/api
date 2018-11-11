@@ -70,7 +70,7 @@ public class Application {
     public ThreadPoolExecutor[] receiveThreadPools() {
         // TODO 先用无界队列，崩了再说
         return Stream.of(ThirdPartyApplication.values()).map(application -> {
-            int poolSize = application.ordinal() + 1 << 2;
+            int poolSize = 4;
             return new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
                     new NamedThreadFactory(application.name() + ThreadPoolNames.RECEIVE_THREAD_POOL));
         }).toArray(ThreadPoolExecutor[]::new);

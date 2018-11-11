@@ -29,11 +29,14 @@ com:
                 totals:
                     - 20
                     - 15
+                    - 15
                 minimums:
                     - 3
                     - 4.5
+                    - 4.5
                 dailies:
                     - 3
+                    - 5
                     - 5
                 patterns:
                     - urlKey=([0-9A-F]{32})
