@@ -14,7 +14,7 @@ CREATE TABLE `cookie` (
   `gmt_create` datetime NOT NULL,
   `gmt_modified` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_phone` (`phone`),
+  UNIQUE KEY `uk_phone_application` (`phone`, `application`),
   UNIQUE KEY `uk_open_id` (`open_id`),
   KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

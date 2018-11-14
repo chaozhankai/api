@@ -95,8 +95,7 @@ public class CookieServiceImpl implements CookieService {
     @Cacheable(cacheNames = CacheNames.COOKIE_RANK)
     @Override
     public List<CookieRankDTO> listCookieRank(ThirdPartyApplication application, int size) {
-        Page<CookieRankView> page = cookieRepository.findCookieRankView(application,
-                PageRequest.of(0, size));
+        Page<CookieRankView> page = cookieRepository.findCookieRankView(application, PageRequest.of(0, size));
         final AtomicInteger ranking = new AtomicInteger();
         List<CookieRankDTO> cookieRankDTOs = page.map(cookieRankView -> {
             CookieRankDTO cookieRankDTO = new CookieRankDTO();
@@ -147,7 +146,7 @@ public class CookieServiceImpl implements CookieService {
         }
         String phone = cookieCheckDTO.getPhone();
         if (application.equals(ThirdPartyApplication.ELE) || application.equals(ThirdPartyApplication.STAR)) {
-            cookie = cookieRepository.findByPhone(phone);
+            cookie = cookieRepository.findByPhoneAndApplication(phone, application);
             if (cookie != null) {
                 cookie.setPhone(null);
                 cookie.setValid(false);
