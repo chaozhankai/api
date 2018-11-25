@@ -136,6 +136,7 @@ public class CookieServiceImpl implements CookieService {
 
     @Override
     public CookieDTO save(String cookieValue, ThirdPartyApplication application, long userId) throws IOException {
+        Timestamp timestamp = Timestamp.from(Instant.now());
         CookieCheckDTO cookieCheckDTO = nodejsService.checkCookie(cookieValue, application);
         String openId = cookieCheckDTO.getOpenid();
         Cookie cookie = cookieRepository.findByOpenId(openId);
@@ -150,6 +151,7 @@ public class CookieServiceImpl implements CookieService {
             if (cookie != null) {
                 cookie.setPhone(null);
                 cookie.setValid(false);
+                cookie.setGmtModified(timestamp);
                 cookieRepository.save(cookie);
             }
         }
@@ -163,7 +165,7 @@ public class CookieServiceImpl implements CookieService {
         cookie.setHeadImgUrl(cookieCheckDTO.getHeadimgurl());
         cookie.setValid(true);
         cookie.setUserId(userId);
-        cookie.setGmtCreate(Timestamp.from(Instant.now()));
+        cookie.setGmtCreate(timestamp);
         cookieRepository.save(cookie);
         if (usage.get(openId) == null) {
             usage.put(openId, 0L);

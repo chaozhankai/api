@@ -346,8 +346,9 @@ public class ReceivingServiceImpl implements ReceivingService {
         }).peek(cookieUseCount -> {
             if (cookieUseCount.getStatus().equals(CookieUseStatus.INVALID)) {
                 cookieRepository.findById(cookieUseCount.getCookieId()).ifPresent(cookie -> {
-                    cookie.setValid(false);
                     cookie.setPhone(null);
+                    cookie.setValid(false);
+                    cookie.setGmtModified(timestamp);
                     cookieRepository.save(cookie);
                 });
             }
