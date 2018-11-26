@@ -17,7 +17,9 @@ import com.mtdhb.api.entity.view.CookieRankDailyView;
  */
 public interface CookieRankDailyRepository extends CrudRepository<CookieRankDaily, Long> {
 
-    @Query("select crd.userId as userId, crd.ranking as ranking, crd.count as count, t.number as number from CookieRankDaily crd, Times t where crd.timesId=t.id and crd.application=?1 and crd.gmtCreate>?2 order by crd.ranking")
+    @Query("select crd.userId as userId, crd.ranking as ranking, crd.count as count, t.number as number"
+            + " from CookieRankDaily crd, Times t where crd.timesId=t.id and crd.application=?1"
+            + " and crd.gmtCreate>?2 order by crd.ranking")
     Page<CookieRankDailyView> findCookieRankDailyView(ThirdPartyApplication application, Timestamp gmtCreate,
             Pageable pageable);
 
