@@ -1,7 +1,6 @@
 package com.mtdhb.api.autoconfigure;
 
 import java.math.BigDecimal;
-import java.util.regex.Pattern;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -29,9 +28,5 @@ public class ThirdPartyApplicationProperties {
      * 每人每天可以领红包的次数
      */
     private long[] dailies;
-    /**
-     * 提取链接的唯一标识的正则表达式
-     */
-    private Pattern[] patterns;
 
 }

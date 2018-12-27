@@ -54,6 +54,10 @@ public class UserController {
 
     private static final Pattern COOKIE_PATTERN = Pattern.compile("^Cookie:.+", Pattern.CASE_INSENSITIVE);
     private static final Pattern PHONE_PATTERN = Pattern.compile("^1\\d{10}$");
+    private static final Pattern URL_KEY_PATTERN = Pattern.compile("urlKey=([0-9A-F]{32})");
+    private static final Pattern SN_PATTERN = Pattern.compile("sn=([0-9a-f]{16})");
+    private static final Pattern CASEID_PATTERN = Pattern.compile("caseid=([0-9]{9})");
+    private static final Pattern SIGN_PATTERN = Pattern.compile("sign=([0-9a-f]{32})");
 
     @Autowired
     private CookieService cookieService;
@@ -185,19 +189,32 @@ public class UserController {
             throw new BusinessException(ErrorCode.URL_ERROR, "url={}", url);
         }
         ThirdPartyApplication application = null;
-        if (url.startsWith("https://h5.ele.me/hongbao/")) {
-            application = ThirdPartyApplication.ELE;
-        } else if (url.startsWith("https://activity.waimai.meituan.com/")
+        Matcher matcher = null;
+        String urlKey = null;
+        if (url.startsWith("https://activity.waimai.meituan.com/")
                 || url.startsWith("http://activity.waimai.meituan.com/")) {
             application = ThirdPartyApplication.MEITUAN;
-        } else {
+            matcher = URL_KEY_PATTERN.matcher(url);
+            if (matcher.find()) {
+                urlKey = matcher.group(1);
+            }
+        } else if (url.startsWith("https://h5.ele.me/hongbao/")) {
+            application = ThirdPartyApplication.ELE;
+            matcher = SN_PATTERN.matcher(url);
+            if (matcher.find()) {
+                urlKey = matcher.group(1);
+            }
+        } else if (url.startsWith("https://star.ele.me/")) {
+            application = ThirdPartyApplication.STAR;
+            Matcher caseIdMatcher = CASEID_PATTERN.matcher(url);
+            Matcher signMatcher = SIGN_PATTERN.matcher(url);
+            if (caseIdMatcher.find() && signMatcher.find()) {
+                urlKey = caseIdMatcher.group(1) + "|" + signMatcher.group(1);
+            }
+        }
+        if (application == null || urlKey == null) {
             throw new BusinessException(ErrorCode.URL_ERROR, "url={}", url);
         }
-        Matcher matcher = thirdPartyApplicationProperties.getPatterns()[application.ordinal()].matcher(url);
-        if (!matcher.find()) {
-            throw new BusinessException(ErrorCode.URL_ERROR, "url={}", url);
-        }
-        String urlKey = matcher.group(1);
         String receivingLock = Synchronizes.buildReceivingLock(urlKey, application);
         UserDTO userDTO = RequestContextHolder.get();
         long userId = userDTO.getId();

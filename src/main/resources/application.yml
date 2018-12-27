@@ -38,9 +38,6 @@ com:
                     - 3
                     - 5
                     - 5
-                patterns:
-                    - urlKey=([0-9A-F]{32})
-                    - sn=([0-9a-f]{16})
             login-interceptor:
                 include-patterns:
                     - "/**"

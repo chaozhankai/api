@@ -288,12 +288,19 @@ public class ReceivingServiceImpl implements ReceivingService {
         try {
             resultDTO = nodejsService.getHongbao(url, phone, application, available, cookies);
         } catch (IOException e) {
-            // TODO IOException 先记录错误日志，cookie 待处理
+            // TODO IOException 先记录错误日志，暂不记录 cookie 使用次数
             log.error("receiving={}, cookies={}, available={}", receiving, cookies, available, e);
             receiving.setMessage(e.getClass().getSimpleName());
             receiving.setGmtModified(Timestamp.from(Instant.now()));
             receivingRepository.save(receiving);
             return;
+        } finally {
+            // 移除统计
+            cookies.forEach(cookie -> {
+                if (usage.remove(cookie.getOpenId()) == null) {
+                    log.error("usage#remove error. cookie={}", cookie);
+                }
+            });
         }
         Timestamp timestamp = Timestamp.from(Instant.now());
         // 设置领取完成时间
@@ -301,14 +308,14 @@ public class ReceivingServiceImpl implements ReceivingService {
         receiving.setMessage(resultDTO.getMessage());
         RedPacketDTO redPacketDTO = resultDTO.getData();
         if (redPacketDTO == null) {
-            // TODO Node.js 服务抛出运行时异常才会导致 redPacketDTO 为 null，先记录错误日志，cookie 待处理
+            // TODO Node.js 服务抛出运行时异常才会导致 redPacketDTO 为 null，先记录错误日志，暂不记录 cookie 使用次数
             log.error("receiving={}, cookies={}, available={}, resultDTO={}", receiving, cookies, available, resultDTO);
             receivingRepository.save(receiving);
             return;
         }
         List<CookieUseStatusDTO> cookieUseStatusDTOs = redPacketDTO.getCookies();
         if (cookieUseStatusDTOs == null) {
-            // TODO Node.js 服务抛出运行时异常才会导致 cookieUseStatusDTOs 为 null，先记录错误日志，cookie 待处理
+            // TODO Node.js 服务抛出运行时异常才会导致 cookieUseStatusDTOs 为 null，先记录错误日志，暂不记录 cookie 使用次数
             log.error("receiving={}, cookies={}, available={}, resultDTO={}", receiving, cookies, available, resultDTO);
             receivingRepository.save(receiving);
             return;
@@ -316,49 +323,39 @@ public class ReceivingServiceImpl implements ReceivingService {
         AtomicInteger cookieUseSuccessCount = new AtomicInteger();
         Map<Long, Cookie> cookiesToMap = cookies.stream().collect(Collectors.toMap(Cookie::getId, cookie -> cookie));
         // 已使用的 cookie 处理
-        List<CookieUseCount> cookieUseCounts = cookieUseStatusDTOs.stream().map(cookieUseStatusDTO -> {
-            long cookieId = cookieUseStatusDTO.getId();
-            CookieUseStatus status = CookieUseStatus.values()[cookieUseStatusDTO.getStatus()];
-            CookieUseCount cookieUseCount = new CookieUseCount();
-            cookieUseCount.setStatus(status);
-            cookieUseCount.setApplication(application);
-            cookieUseCount.setCookieId(cookieId);
-            cookieUseCount.setReceivingId(receiving.getId());
-            cookieUseCount.setReceivingUserId(receiving.getUserId());
-            cookieUseCount.setGmtCreate(timestamp);
-            return cookieUseCount;
-        }).peek(cookieUseCount -> {
-            Cookie cookie = cookiesToMap.remove(cookieUseCount.getCookieId());
-            String openId = cookie.getOpenId();
-            cookieUseCount.setOpenId(openId);
-            cookieUseCount.setCookieUserId(cookie.getUserId());
-            long n = usage.remove(openId) + 1L;
-            if (n < thirdPartyApplicationProperties.getDailies()[application.ordinal()]
-                    && !cookieUseCount.getStatus().equals(CookieUseStatus.INVALID)) {
-                usage.put(openId, n);
-                // 未达到每人每天可以领红包的次数的有效 cookie 放回队列
-                queue.offer(cookie);
-            }
-        }).peek(cookieUseCount -> {
-            if (cookieUseCount.getStatus().equals(CookieUseStatus.SUCCESS)) {
-                cookieUseSuccessCount.incrementAndGet();
-            }
-        }).peek(cookieUseCount -> {
-            if (cookieUseCount.getStatus().equals(CookieUseStatus.INVALID)) {
-                cookieRepository.findById(cookieUseCount.getCookieId()).ifPresent(cookie -> {
-                    cookie.setPhone(null);
-                    cookie.setValid(false);
-                    cookie.setGmtModified(timestamp);
-                    cookieRepository.save(cookie);
-                });
-            }
-        }).collect(Collectors.toList());
+        List<CookieUseCount> cookieUseCounts = cookieUseStatusDTOs.stream()
+                .filter(cookieUseStatusDTO -> cookieUseStatusDTO.getStatus() != CookieUseStatus.SUSPEND.ordinal())
+                .map(cookieUseStatusDTO -> {
+                    long cookieId = cookieUseStatusDTO.getId();
+                    CookieUseStatus status = CookieUseStatus.values()[cookieUseStatusDTO.getStatus()];
+                    CookieUseCount cookieUseCount = new CookieUseCount();
+                    cookieUseCount.setStatus(status);
+                    cookieUseCount.setApplication(application);
+                    cookieUseCount.setCookieId(cookieId);
+                    cookieUseCount.setReceivingId(receiving.getId());
+                    cookieUseCount.setReceivingUserId(receiving.getUserId());
+                    cookieUseCount.setGmtCreate(timestamp);
+                    Cookie cookie = cookiesToMap.remove(cookieUseCount.getCookieId());
+                    String openId = cookie.getOpenId();
+                    cookieUseCount.setOpenId(openId);
+                    cookieUseCount.setCookieUserId(cookie.getUserId());
+                    return cookieUseCount;
+                }).peek(cookieUseCount -> {
+                    if (cookieUseCount.getStatus().equals(CookieUseStatus.SUCCESS)) {
+                        cookieUseSuccessCount.incrementAndGet();
+                    }
+                }).peek(cookieUseCount -> {
+                    if (cookieUseCount.getStatus().equals(CookieUseStatus.INVALID)) {
+                        cookieRepository.findById(cookieUseCount.getCookieId()).ifPresent(cookie -> {
+                            cookie.setPhone(null);
+                            cookie.setValid(false);
+                            cookie.setGmtModified(timestamp);
+                            cookieRepository.save(cookie);
+                        });
+                    }
+                }).collect(Collectors.toList());
         // TODO 可更优化为 mysql native 批量插入
         cookieUseCountRepository.saveAll(cookieUseCounts);
-        // 未使用的 cookie 放回队列
-        cookiesToMap.forEach((id, cookie) -> {
-            queue.offer(cookie);
-        });
         RedPacketResultDTO redPacketResultDTO = redPacketDTO.getResult();
         if (redPacketResultDTO != null) {
             Integer type = redPacketResultDTO.getType();

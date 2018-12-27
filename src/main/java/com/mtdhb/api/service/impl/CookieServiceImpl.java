@@ -119,6 +119,10 @@ public class CookieServiceImpl implements CookieService {
         int numberOfElements = cookieUseCountViews.getNumberOfElements();
         log.info("cookieUseCountViews#size={}", numberOfElements);
         if (numberOfElements < 1) {
+            if (upper != Long.MAX_VALUE) {
+                endpoints[application.ordinal()].set(Long.MAX_VALUE);
+                load(application);
+            }
             return;
         }
         CookieUseCountView last = cookieUseCountViews.getContent().get(numberOfElements - 1);
@@ -127,10 +131,12 @@ public class CookieServiceImpl implements CookieService {
         // 重设端点值
         endpoint.set(newUpper);
         cookieUseCountViews.forEach(cookieUseCountView -> {
-            Cookie cookie = new Cookie();
-            BeanUtils.copyProperties(cookieUseCountView, cookie);
-            queue.offer(cookie);
-            usage.put(cookieUseCountView.getOpenId(), cookieUseCountView.getCount());
+            if (usage.get(cookieUseCountView.getOpenId()) == null) {
+                Cookie cookie = new Cookie();
+                BeanUtils.copyProperties(cookieUseCountView, cookie);
+                queue.offer(cookie);
+                usage.put(cookieUseCountView.getOpenId(), cookieUseCountView.getCount());
+            }
         });
     }
 

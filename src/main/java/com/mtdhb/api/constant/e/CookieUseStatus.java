@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum CookieUseStatus {
 
-    SUCCESS, USED, INVALID, LIMIT;
+    SUCCESS, USED, INVALID, LIMIT, SUSPEND;
 
     @JsonValue
     public int getJsonValue() {

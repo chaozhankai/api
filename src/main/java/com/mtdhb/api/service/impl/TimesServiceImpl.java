@@ -75,7 +75,7 @@ public class TimesServiceImpl implements TimesService {
     public void gift() {
         int size = 100;
         // TODO 配置
-        long[] numbers = new long[] { 100, 80, 60, 40, 40, 40, 40, 40, 40, 40, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
+        long[] numbers = new long[] { 100, 80, 60, 40, 40, 40, 40, 40, 40, 40 };
         Timestamp timestamp = Timestamp.from(Instant.now());
         // TODO 配置
         List<CookieRankDTO> list = cookieService.listCookieRank(ThirdPartyApplication.ELE, size);

@@ -167,7 +167,7 @@ public class Mail {
             transport.close();
             return true;
         } catch (Exception e) {
-            log.error(e.getMessage(),
+            log.error(
                     "index={}, properties={}, to={}, cc={}, bcc={}, subject={}, content={}, images={}, attachments={}",
                     index, properties, to, cc, bcc, subject, content, images, attachments, e);
         }
