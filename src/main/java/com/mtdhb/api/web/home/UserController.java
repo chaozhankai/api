@@ -178,8 +178,12 @@ public class UserController {
             url = url.substring(0, url.length() - 1);
         }
         try {
-            // 支持 url.cn 的短链接
-            if (url.startsWith("https://url.cn/") || url.startsWith("http://url.cn/")) {
+            // 支持 url.cn 和 dpurl.cn 的短链接
+            if (url.startsWith("https://url.cn/") || 
+                url.startsWith("http://url.cn/") || 
+                url.startsWith("https://dpurl.cn/") || 
+                url.startsWith("http://dpurl.cn/")
+            ) {
                 url = Connections.getRedirectURL(url);
             }
             // see org.hibernate.validator.internal.constraintvalidators.hv.URLValidator
