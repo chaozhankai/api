@@ -13,6 +13,7 @@ import lombok.Data;
 @Data
 public class AccountDTO {
 
+    // ZhanKai Pull Request
     @NotNull
     @Size(min = 6, max = 16)
     private String password;
